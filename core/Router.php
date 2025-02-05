@@ -3,7 +3,7 @@
 namespace Core;
 class Router
 {
-    public static function route()
+    public static function route(): void
     {
         require BASE_PATH . '/routes/web.php';
 
@@ -21,5 +21,8 @@ class Router
                 }
             }
         }
+
+        http_response_code(HTTP_NOT_FOUND);
+        include view('errors/404.php');
     }
 }

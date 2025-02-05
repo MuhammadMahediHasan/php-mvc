@@ -19,6 +19,7 @@
     },
     "minimum-stability": "dev",
     "require": {
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+      "ext-json": "*"
     }
 }
