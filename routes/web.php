@@ -8,6 +8,7 @@ const ROUTES = [
     '/home' => [HomeController::class, 'index'],
     '/buyer-transactions' => [BuyerController::class, 'index'],
     '/buyer-transactions/create' => [BuyerController::class, 'create'],
+    '/buyer-transactions/report' => [BuyerController::class, 'report'],
     '/buyer-transactions/load' => [BuyerController::class, 'load'],
     '/buyer-transactions/store' => [BuyerController::class, 'store'],
 ];

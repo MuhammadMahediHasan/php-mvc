@@ -26,6 +26,11 @@ class BuyerController extends Controller
         $this->loadView('buyer-form.php');
     }
 
+    public function report(): void
+    {
+        $this->loadView('buyer-report.php');
+    }
+
     public function load(): void
     {
         $users = $this->model->getAll();
