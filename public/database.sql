@@ -1,4 +1,4 @@
-CREATE TABLE transactions (
+CREATE TABLE buyer_transactions (
   id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   amount INT(10) NOT NULL,
   buyer VARCHAR(255) NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE transactions (
   phone VARCHAR(20) NOT NULL,
   hash_key VARCHAR(255) NOT NULL,
   entry_at DATE NOT NULL,
-  entry_by VARCHAR(10) NULL,
+  entry_by VARCHAR(10) NULL
 );

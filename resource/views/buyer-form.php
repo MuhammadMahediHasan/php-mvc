@@ -47,6 +47,12 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <small class="text-danger" id="phone-error"></small>
+                        </div>
+
+                        <div class="form-group">
                             <label for="city">City (Text, Spaces)</label>
                             <input type="text" class="form-control" id="city" name="city" required pattern="[A-Za-z\s]+">
                             <small class="text-danger" id="city-error"></small>

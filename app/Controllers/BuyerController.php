@@ -45,7 +45,8 @@ class BuyerController extends Controller
                 'items' => ['required', 'text'],
                 'buyer_email' => ['required', 'email'],
                 'note' => ['required', 'unicode', 'max_words:30'],
-                'city' => ['required', 'text']
+                'phone' => ['required', 'text'],
+                'city' => ['required', 'text'],
             ]);
             if (!empty($errors)) {
                 echo json_encode(['success' => false, 'errors' => $errors]);
@@ -59,6 +60,7 @@ class BuyerController extends Controller
                 'items' => filter_var(trim($_POST['items']), FILTER_SANITIZE_STRING),
                 'buyer_email' => filter_var(trim($_POST['buyer_email']), FILTER_SANITIZE_EMAIL),
                 'note' => filter_var(trim($_POST['note']), FILTER_SANITIZE_STRING),
+                'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_STRING),
                 'city' => filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING),
                 'buyer_ip' => $_SERVER['REMOTE_ADDR'],
                 'hash_key' => hash('sha512', $_POST['receipt_id'] . 'salt'),
