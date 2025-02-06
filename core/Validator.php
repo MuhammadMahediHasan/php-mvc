@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use Exception;
+
 class Validator
 {
     protected array $errors = [];
@@ -15,19 +17,23 @@ class Validator
         'max_words' => 'validateMaxWords'
     ];
 
+    /**
+     * @throws Exception
+     */
     public function validate(array $fields): array
     {
         foreach ($fields as $column => $rules) {
             foreach ($rules as $rule) {
                 [$ruleName, $ruleValue] = explode(':', $rule . ':');
+                if (!array_key_exists($ruleName, $this->rules)) {
+                    throw new Exception("Rule '{$ruleName}' does not exist.");
+                }
 
-                if (isset($this->rules[$ruleName])) {
-                    $method = $this->rules[$ruleName];
-                    $isValid = $this->$method($_POST[$column] ?? '', $ruleValue);
+                $method = $this->rules[$ruleName];
+                $isValid = $this->$method($_POST[$column] ?? '', $ruleValue);
 
-                    if (!$isValid) {
-                        $this->errors[$column] = $this->getErrorMessage($column, $ruleName, $ruleValue);
-                    }
+                if (!$isValid) {
+                    $this->errors[$column] = $this->getErrorMessage($column, $ruleName, $ruleValue);
                 }
             }
         }
