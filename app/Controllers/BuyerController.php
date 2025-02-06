@@ -36,8 +36,17 @@ class BuyerController extends Controller
     {
         try {
             $response = ['success' => false];
+            $validator = new Validator();
 
-            $errors = $this->validation();
+            $errors = $validator->validate([
+                'amount' => ['required', 'number'],
+                'buyer' => ['required', 'text', 'max:20'],
+                'receipt_id' => ['required', 'text'],
+                'items' => ['required', 'text'],
+                'buyer_email' => ['required', 'email'],
+                'note' => ['required', 'unicode', 'max_words:30'],
+                'city' => ['required', 'text']
+            ]);
             if (!empty($errors)) {
                 echo json_encode(['success' => false, 'errors' => $errors]);
                 return;
@@ -62,26 +71,9 @@ class BuyerController extends Controller
 
             echo successResponse($response, HTTP_CREATED);
         } catch (\Exception $exception) {
-            echo $exception->getMessage();
+            echo errorResponse([
+                'message' => $exception->getMessage()
+            ], HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private function validation(): array
-    {
-        $validationErrors['amount'] = Validator::make('amount', ['required', 'number', 'max:20']);
-
-        $validationErrors['buyer'] = Validator::make('buyer', ['required', 'text', 'max:20']);
-
-        $validationErrors['receipt_id'] = Validator::make('receipt_id', ['required', 'text']);
-
-        $validationErrors['items'] = Validator::make('items', ['required', 'text']);
-
-        $validationErrors['buyer_email'] = Validator::make('buyer_email', ['required', 'email']);
-
-        $validationErrors['note'] = Validator::make('note', ['required', 'unicode', 'max_words:30']);
-
-        $validationErrors['city'] = Validator::make('city', ['required', 'text']);
-
-        return array_filter($validationErrors);
     }
 }

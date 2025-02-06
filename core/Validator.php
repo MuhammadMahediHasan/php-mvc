@@ -4,138 +4,83 @@ namespace Core;
 
 class Validator
 {
-    protected static array $errors = [];
+    protected array $errors = [];
+    protected array $rules = [
+        'required' => 'validateRequired',
+        'number' => 'validateNumber',
+        'max' => 'validateMaxLength',
+        'text' => 'validateText',
+        'email' => 'validateEmail',
+        'unicode' => 'validateUnicode',
+        'max_words' => 'validateMaxWords'
+    ];
 
-    /**
-     * @param $column
-     * @param $rules
-     * @return string|null
-     */
-    public static function make($column, $rules): ?string
+    public function validate(array $fields): array
     {
-        foreach ($rules as $rule) {
-            $result = self::applyRule($column, $rule);
-            if ($result) {
-                return $result;
+        foreach ($fields as $column => $rules) {
+            foreach ($rules as $rule) {
+                [$ruleName, $ruleValue] = explode(':', $rule . ':');
+
+                if (isset($this->rules[$ruleName])) {
+                    $method = $this->rules[$ruleName];
+                    $isValid = $this->$method($_POST[$column] ?? '', $ruleValue);
+
+                    if (!$isValid) {
+                        $this->errors[$column] = $this->getErrorMessage($column, $ruleName, $ruleValue);
+                    }
+                }
             }
         }
-        return null;
+        return $this->errors;
     }
 
-    /**
-     * @param $column
-     * @param $rule
-     * @return string|null
-     */
-    private static function applyRule($column, $rule): ?string
+    protected function validateRequired($value): bool
     {
-        $ruleParts = explode(':', $rule);
-        $ruleName = $ruleParts[0];
-        $ruleValue = $ruleParts[1] ?? null;
-
-        return match ($ruleName) {
-            'required' => self::validateRequired($column),
-            'number' => self::validateNumber($column),
-            'max' => self::validateMaxLength($column, $ruleValue),
-            'text' => self::validateText($column),
-            'email' => self::validateEmail($column),
-            'unicode' => self::validateUnicode($column),
-            'max_words' => self::validateMaxWords($column, $ruleValue),
-            default => null,
-        };
+        return !empty(trim($value));
     }
 
-    /**
-     * @param $column
-     * @return string|null
-     */
-    private static function validateRequired($column): ?string
+    protected function validateNumber($value): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (empty($value)) {
-            return ucfirst($column) . ' is required.';
-        }
-        return null;
+        return is_numeric($value);
     }
 
-    /**
-     * @param $column
-     * @return string|null
-     */
-    private static function validateNumber($column): ?string
+    protected function validateMaxLength($value, $max): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (!is_numeric($value)) {
-            return ucfirst($column) . ' must be a valid number.';
-        }
-        return null;
+        return strlen($value) <= (int) $max;
     }
 
-    /**
-     * @param $column
-     * @param $maxLength
-     * @return string|null
-     */
-    private static function validateMaxLength($column, $maxLength): ?string
+    protected function validateText($value): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (strlen($value) > $maxLength) {
-            return ucfirst($column) . ' must not exceed ' . $maxLength . ' characters.';
-        }
-        return null;
+        return preg_match('/^[a-zA-Z0-9 ]+$/', $value);
     }
 
-    /**
-     * @param $column
-     * @return string|null
-     */
-    private static function validateText($column): ?string
+    protected function validateEmail($value): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (!preg_match("/^[a-zA-Z0-9 ]*$/", $value)) {
-            return ucfirst($column) . ' must contain only letters, numbers, and spaces.';
-        }
-        return null;
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
-    /**
-     * @param $column
-     * @return string|null
-     */
-    private static function validateEmail($column): ?string
+    protected function validateUnicode($value): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            return ucfirst($column) . ' must be a valid email address.';
-        }
-        return null;
+        return mb_check_encoding($value, 'UTF-8');
     }
 
-    /**
-     * @param $column
-     * @return string|null
-     */
-    private static function validateUnicode($column): ?string
+    protected function validateMaxWords($value, $max): bool
     {
-        $value = $_POST[$column] ?? null;
-        if (preg_match('/[^\x20-\x7E]/', $value)) { // Matches non-ASCII characters
-            return ucfirst($column) . ' must support Unicode characters.';
-        }
-        return null;
+        return str_word_count($value) <= (int) $max;
     }
 
-    /**
-     * @param $column
-     * @param $maxWords
-     * @return string|null
-     */
-    private static function validateMaxWords($column, $maxWords): ?string
+    protected function getErrorMessage($column, $rule, $value = null): string
     {
-        $value = $_POST[$column] ?? null;
-        $wordCount = str_word_count($value);
-        if ($wordCount > $maxWords) {
-            return ucfirst($column) . ' must not exceed ' . $maxWords . ' words.';
-        }
-        return null;
+        $messages = [
+            'required' => ucfirst($column) . ' is required.',
+            'number' => ucfirst($column) . ' must be a number.',
+            'max' => ucfirst($column) . " must not exceed $value characters.",
+            'text' => ucfirst($column) . ' must contain only letters, numbers, and spaces.',
+            'email' => ucfirst($column) . ' must be a valid email address.',
+            'unicode' => ucfirst($column) . ' must contain valid Unicode characters.',
+            'max_words' => ucfirst($column) . " must not exceed $value words."
+        ];
+
+        return $messages[$rule] ?? 'Invalid input.';
     }
 }
