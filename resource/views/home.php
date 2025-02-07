@@ -1,4 +1,4 @@
-<?php include_once view('layout/header.php') ?>
+<?php startSection('content'); ?>
 
 <div class="container mt-auto">
     <div class="row pt-4">
@@ -15,4 +15,13 @@
     </div>
 </div>
 
-<?php include_once view('layout/footer.php') ?>
+<?php endSection(); ?>
+
+<?php startSection('scripts'); ?>
+
+<script> </script>
+
+<?php endSection(); ?>
+
+<?php require_once view('layout/layout.php'); ?>
+

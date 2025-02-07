@@ -1,4 +1,4 @@
-<?php include_once view('layout/header.php') ?>
+<?php startSection('content'); ?>
 
 <div class="container mt-auto">
     <div class="row pt-4">
@@ -35,18 +35,7 @@
                                     <th>City</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -57,4 +46,42 @@
     </div>
 </div>
 
-<?php include_once view('layout/footer.php') ?>
+<?php endSection(); ?>
+
+<?php startSection('scripts'); ?>
+
+<script>
+    const fetchReportData = () => {
+        $.ajax({
+            url: '/buyer-transactions/load',
+            type: 'GET',
+            data: $('#search-form').serialize(),
+            dataType: 'json',
+            success: function ({data, status}) {
+                $('table > tbody').empty();
+                data.forEach((v) => {
+                    $('table > tbody').append(`
+                        <tr>
+                            <td>${v.amount}</td>
+                            <td>${v.buyer}</td>
+                            <td>${v.receipt_id}</td>
+                            <td>${v.items}</td>
+                            <td>${v.buyer_email}</td>
+                            <td>${v.note}</td>
+                            <td>${v.phone}</td>
+                            <td>${v.city}</td>
+                        </tr>
+                    `);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Request failed: ', error);
+            }
+        });
+    };
+    fetchReportData();
+</script>
+
+<?php endSection(); ?>
+
+<?php require_once view('layout/layout.php'); ?>

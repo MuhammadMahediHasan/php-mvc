@@ -15,12 +15,6 @@ class BuyerController extends Controller
         $this->model = new BuyerTransaction();
     }
 
-    public function index(): void
-    {
-        $users = $this->model->getAll();
-        $this->loadView('users.php', ['users' => $users]);
-    }
-
     public function create(): void
     {
         $this->loadView('buyer-form.php');
@@ -33,8 +27,8 @@ class BuyerController extends Controller
 
     public function load(): void
     {
-        $users = $this->model->getAll();
-        $this->loadView('user_grid.php', ['users' => $users]);
+        $data = $this->model->getAll();
+        echo successResponse(['data' => $data], HTTP_OK);
     }
 
     public function store(): void
@@ -50,11 +44,11 @@ class BuyerController extends Controller
                 'items' => ['required', 'text'],
                 'buyer_email' => ['required', 'email'],
                 'note' => ['required', 'unicode', 'max_words:30'],
-                'phone' => ['required', 'text'],
+                'phone' => ['required'],
                 'city' => ['required', 'text'],
             ]);
             if (!empty($errors)) {
-                echo json_encode(['success' => false, 'errors' => $errors]);
+                echo successResponse(['success' => false, 'errors' => $errors], UNPROCESSABLE_ENTITY);
                 return;
             }
 

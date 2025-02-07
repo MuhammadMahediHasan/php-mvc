@@ -1,4 +1,4 @@
-<?php include_once view('layout/header.php') ?>
+<?php startSection('content'); ?>
 
 <div class="container mt-auto">
     <div class="row pt-4">
@@ -68,4 +68,40 @@
     </div>
 </div>
 
-<?php include_once view('layout/footer.php') ?>
+<?php endSection(); ?>
+
+<?php startSection('scripts'); ?>
+
+<script>
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+
+        $('.text-danger').text('').hide();
+        $('.form-control').removeClass('is-invalid');
+
+        $.ajax({
+            url: '/buyer-transactions/store',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function ({success, status}) {
+                if (status === 201) {
+                    alert('Form submitted successfully!');
+                }
+            },
+            error: function ({status, responseJSON}) {
+                if (status === 422) {
+                    for (let field in responseJSON.errors) {
+                        const errorMessage = responseJSON.errors[field];
+                        $(`#${field}-error`).text(errorMessage).show();
+                        $(`#${field}`).addClass('is-invalid');
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<?php endSection(); ?>
+
+<?php require_once view('layout/layout.php'); ?>

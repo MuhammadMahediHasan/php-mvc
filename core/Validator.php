@@ -57,7 +57,7 @@ class Validator
 
     protected function validateText($value): bool
     {
-        return preg_match('/^[a-zA-Z0-9 ]+$/', $value);
+        return is_string($value);
     }
 
     protected function validateEmail($value): bool

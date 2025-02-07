@@ -6,6 +6,28 @@ const HTTP_OK = 200;
 const HTTP_CREATED = 201;
 const HTTP_NOT_FOUND = 404;
 const HTTP_INTERNAL_SERVER_ERROR = 500;
+const UNPROCESSABLE_ENTITY = 422;
+
+$domSections = [];
+
+function startSection($name): void
+{
+    global $domSections;
+    ob_start();
+    $domSections[$name] = '';
+}
+
+function endSection(): void
+{
+    global $domSections;
+    $lastKey = array_key_last($domSections);
+    $domSections[$lastKey] = ob_get_clean();
+}
+
+function yieldSection($name) {
+    global $domSections;
+    return $domSections[$name] ?? '';
+}
 
 if (!function_exists('asset')) {
     function asset($path): string
