@@ -75,7 +75,7 @@ class BuyerController extends Controller
                 'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_NUMBER_INT),
                 'city' => filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING),
                 'buyer_ip' => $_SERVER['REMOTE_ADDR'],
-                'hash_key' => hash('sha512', $_POST['receipt_id'] . 'salt'),
+                'hash_key' => hash('sha512', $_POST['receipt_id'] . 'test-salt'),
                 'entry_at' => date('Y-m-d'),
                 'entry_by' => filter_var(trim($_POST['entry_by']), FILTER_SANITIZE_NUMBER_INT),
             ];
