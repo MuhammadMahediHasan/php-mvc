@@ -39,7 +39,7 @@ class BuyerController extends Controller
                 'amount' => ['required', 'number'],
                 'buyer' => ['required', 'text', 'max:20'],
                 'receipt_id' => ['required', 'text'],
-                'items' => ['required', 'text'],
+                'items' => ['required'],
                 'buyer_email' => ['required', 'email'],
                 'note' => ['required', 'unicode', 'max_words:30'],
                 'phone' => ['required', 'phone'],
@@ -69,7 +69,7 @@ class BuyerController extends Controller
                 'amount' => filter_var(trim($_POST['amount']), FILTER_SANITIZE_NUMBER_INT),
                 'buyer' => filter_var(trim($_POST['buyer']), FILTER_SANITIZE_STRING),
                 'receipt_id' => filter_var(trim($_POST['receipt_id']), FILTER_SANITIZE_STRING),
-                'items' => filter_var(trim($_POST['items']), FILTER_SANITIZE_STRING),
+                'items' => implode(', ', $_POST['items']),
                 'buyer_email' => filter_var(trim($_POST['buyer_email']), FILTER_SANITIZE_EMAIL),
                 'note' => filter_var(trim($_POST['note']), FILTER_SANITIZE_STRING),
                 'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_NUMBER_INT),
@@ -81,7 +81,6 @@ class BuyerController extends Controller
             ];
 
             $response['success'] = $this->model->insert($data);
-
 
             echo successResponse($response, HTTP_CREATED);
         } catch (\Exception $exception) {

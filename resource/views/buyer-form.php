@@ -30,7 +30,7 @@
 
                         <div class="form-group">
                             <label for="items">Items (Multiple, Text)</label>
-                            <select id="items" name="items"  class="form-control select2-tag" multiple="multiple">
+                            <select id="items" name="items[]"  class="form-control select2-tag" multiple="multiple">
                             </select>
 <!--                            <input type="text" class="form-control" id="items" name="items" >-->
                             <small class="text-danger" id="items-error"></small>

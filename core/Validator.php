@@ -43,6 +43,9 @@ class Validator
 
     protected function validateRequired($value): bool
     {
+        if (is_array($value) && count($value) > 0) {
+            return true;
+        }
         return !empty(trim($value));
     }
 
