@@ -34,9 +34,7 @@ class BuyerController extends Controller
     public function store(): void
     {
         try {
-            $response = ['success' => false];
             $validator = new Validator();
-
             $errors = $validator->validate([
                 'amount' => ['required', 'number'],
                 'buyer' => ['required', 'text', 'max:20'],
@@ -44,11 +42,26 @@ class BuyerController extends Controller
                 'items' => ['required', 'text'],
                 'buyer_email' => ['required', 'email'],
                 'note' => ['required', 'unicode', 'max_words:30'],
-                'phone' => ['required'],
+                'phone' => ['required', 'phone'],
                 'city' => ['required', 'text'],
+                'entry_by' => ['required', 'number'],
             ]);
+
             if (!empty($errors)) {
-                echo successResponse(['success' => false, 'errors' => $errors], UNPROCESSABLE_ENTITY);
+                echo successResponse([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $errors
+                ], UNPROCESSABLE_ENTITY);
+                return;
+            }
+
+            if ($this->isSubmittedBefore()) {
+                echo successResponse([
+                    'success' => false,
+                    'message' => 'You have already submitted within 24 hours.',
+                    'errors' => []
+                ], UNPROCESSABLE_ENTITY);
                 return;
             }
 
@@ -59,12 +72,12 @@ class BuyerController extends Controller
                 'items' => filter_var(trim($_POST['items']), FILTER_SANITIZE_STRING),
                 'buyer_email' => filter_var(trim($_POST['buyer_email']), FILTER_SANITIZE_EMAIL),
                 'note' => filter_var(trim($_POST['note']), FILTER_SANITIZE_STRING),
-                'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_STRING),
+                'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_NUMBER_INT),
                 'city' => filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING),
                 'buyer_ip' => $_SERVER['REMOTE_ADDR'],
                 'hash_key' => hash('sha512', $_POST['receipt_id'] . 'salt'),
                 'entry_at' => date('Y-m-d'),
-                'entry_by' => null,
+                'entry_by' => filter_var(trim($_POST['entry_by']), FILTER_SANITIZE_NUMBER_INT),
             ];
 
             $response['success'] = $this->model->insert($data);
@@ -76,5 +89,16 @@ class BuyerController extends Controller
                 'message' => $exception->getMessage()
             ], HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function isSubmittedBefore(): bool
+    {
+        if ($_COOKIE['formSubmitted']) {
+            return true;
+        }
+
+        setcookie("formSubmitted", true, time() + (24 * 60 * 60), "/");
+
+        return false;
     }
 }

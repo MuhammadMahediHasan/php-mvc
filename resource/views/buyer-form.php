@@ -48,7 +48,7 @@
 
                         <div class="form-group">
                             <label for="phone">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <input type="number" value="880" class="form-control" id="phone" name="phone" required>
                             <small class="text-danger" id="phone-error"></small>
                         </div>
 
@@ -58,6 +58,11 @@
                             <small class="text-danger" id="city-error"></small>
                         </div>
 
+                        <div class="form-group">
+                            <label for="entry_by">Entry By</label>
+                            <input type="number" class="form-control" id="entry_by" name="entry_by" required>
+                            <small class="text-danger" id="entry-by-error"></small>
+                        </div>
 
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -91,6 +96,7 @@
             },
             error: function ({status, responseJSON}) {
                 if (status === 422) {
+                    alert(responseJSON.message);
                     for (let field in responseJSON.errors) {
                         const errorMessage = responseJSON.errors[field];
                         $(`#${field}-error`).text(errorMessage).show();

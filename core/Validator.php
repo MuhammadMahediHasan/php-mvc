@@ -13,6 +13,7 @@ class Validator
         'max' => 'validateMaxLength',
         'text' => 'validateText',
         'email' => 'validateEmail',
+        'phone' => 'validatePhone',
         'unicode' => 'validateUnicode',
         'max_words' => 'validateMaxWords'
     ];
@@ -65,6 +66,19 @@ class Validator
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
+    function validatePhone($phone): bool|string
+    {
+        if (!str_starts_with($phone, '880')) {
+            return false;
+        }
+
+        if (strlen($phone) > 13 || strlen($phone) < 11) {
+            return false;
+        }
+
+        return true;
+    }
+
     protected function validateUnicode($value): bool
     {
         return mb_check_encoding($value, 'UTF-8');
@@ -83,6 +97,7 @@ class Validator
             'max' => ucfirst($column) . " must not exceed $value characters.",
             'text' => ucfirst($column) . ' must contain only letters, numbers, and spaces.',
             'email' => ucfirst($column) . ' must be a valid email address.',
+            'phone' => ucfirst($column) . ' must be a valid phone number.',
             'unicode' => ucfirst($column) . ' must contain valid Unicode characters.',
             'max_words' => ucfirst($column) . " must not exceed $value words."
         ];
