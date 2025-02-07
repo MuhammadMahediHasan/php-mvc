@@ -4,11 +4,25 @@ use App\Controllers\BuyerController;
 use App\Controllers\HomeController;
 
 const ROUTES = [
-    '/' => [HomeController::class, 'index'],
-    '/home' => [HomeController::class, 'index'],
-    '/buyer-transactions' => [BuyerController::class, 'index'],
-    '/buyer-transactions/create' => [BuyerController::class, 'create'],
-    '/buyer-transactions/report' => [BuyerController::class, 'report'],
-    '/buyer-transactions/load' => [BuyerController::class, 'load'],
-    '/buyer-transactions/store' => [BuyerController::class, 'store'],
+    '/' => [
+        'GET' => [HomeController::class, 'index'],
+    ],
+    '/home' => [
+        'GET' => [HomeController::class, 'index'],
+    ],
+    '/buyer-transactions' => [
+        'GET' => [BuyerController::class, 'index'],
+    ],
+    '/buyer-transactions/create' => [
+        'GET' => [BuyerController::class, 'create'],
+    ],
+    '/buyer-transactions/store' => [
+        'POST' => [BuyerController::class, 'store'],
+    ],
+    '/buyer-transactions/report' => [
+        'GET' => [BuyerController::class, 'report'],
+    ],
+    '/buyer-transactions/load' => [
+        'GET' => [BuyerController::class, 'load'],
+    ],
 ];

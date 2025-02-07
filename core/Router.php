@@ -7,10 +7,12 @@ class Router
     {
         require BASE_PATH . '/routes/web.php';
 
-        $request = trim($_SERVER['PATH_INFO']);
-        if (array_key_exists($request, ROUTES)) {
-            $controller = ROUTES[$request][0];
-            $method = ROUTES[$request][1];
+        $requestUri = trim($_SERVER['PATH_INFO']);
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+        if (isset(ROUTES[$requestUri][$requestMethod])) {
+            $controller = ROUTES[$requestUri][$requestMethod][0];
+            $method = ROUTES[$requestUri][$requestMethod][1];
 
             if (class_exists($controller)) {
                 $class = new $controller();
