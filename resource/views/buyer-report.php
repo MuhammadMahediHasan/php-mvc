@@ -8,18 +8,27 @@
                     <h5>Buyer Transaction Report</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="input-group mb-3">
-                                <input type="date" class="form-control" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
+                    <form action="" id="form">
+                        <div class="row">
+                            <div class="col-3 form-group">
+                                <label for="from_date">From Date</label>
+                                <input type="date" class="form-control" id="from_date" name="from_date">
+                            </div>
+                            <div class="col-3 form-group">
+                                <label for="to_date">To Date</label>
+                                <input type="date" class="form-control" id="to_date" name="to_date">
+                            </div>
+                            <div class="col-3 form-group">
+                                <label for="entry_by">Entry By</label>
+                                <input type="text" placeholder="Entry By" class="form-control" id="entry_by" name="entry_by">
+                            </div>
+                            <div class="col-3 form-group">
+                                <label for="">:</label> <br>
+                                <button class="btn btn-primary">Search</button>
                             </div>
                         </div>
-                    </div>
+                    </form>
+
                     <div class="row">
                         <div class="col-12">
                             <table class="table table-bordered" width="100%">
@@ -51,11 +60,16 @@
 <?php startSection('scripts'); ?>
 
 <script>
-    const fetchReportData = () => {
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+
+        fetchReportData($(this).serialize());
+    });
+    const fetchReportData = (payload = {}) => {
         $.ajax({
             url: '/buyer-transactions/load',
             type: 'GET',
-            data: $('#search-form').serialize(),
+            data: payload,
             dataType: 'json',
             success: function ({data, status}) {
                 $('table > tbody').empty();

@@ -18,10 +18,44 @@ class BuyerTransaction extends Model
         $result = null;
 
         if ($conn) {
-            $sql = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
-            $resource = $conn->query($sql);
-            if ($resource) {
-                $result = $resource->fetchAll(PDO::FETCH_ASSOC);
+            $sql = "SELECT * FROM " . $this->table;
+
+            $whereConditions = [];
+            $fromDate = $_GET['from_date'] ?? null;
+            $toDate = $_GET['to_date'] ?? null;
+            $entryBy = $_GET['entry_by'] ?? null;
+
+            if (!empty($fromDate)) {
+                $whereConditions[] = "entry_at >= :from_date";
+            }
+
+            if (!empty($toDate)) {
+                $whereConditions[] = "entry_at <= :to_date";
+            }
+
+            if (!empty($entryBy)) {
+                $whereConditions[] = "entry_by = :entry_by";
+            }
+
+            if (!empty($whereConditions)) {
+                $sql .= " WHERE " . implode(' AND ', $whereConditions);
+            }
+
+            $sql .= " ORDER BY id DESC";
+            $stmt = $conn->prepare($sql);
+
+            if (!empty($fromDate)) {
+                $stmt->bindParam(':from_date', $fromDate);
+            }
+            if (!empty($toDate)) {
+                $stmt->bindParam(':to_date', $toDate);
+            }
+            if (!empty($entryBy)) {
+                $stmt->bindParam(':entry_by', $entryBy);
+            }
+
+            if ($stmt->execute()) {
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
 
