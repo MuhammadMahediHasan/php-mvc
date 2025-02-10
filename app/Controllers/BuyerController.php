@@ -39,7 +39,7 @@ class BuyerController extends Controller
                 'amount' => ['required', 'number'],
                 'buyer' => ['required', 'text', 'max:20'],
                 'receipt_id' => ['required', 'text'],
-                'items' => ['required'],
+                'items' => ['required', 'array'],
                 'buyer_email' => ['required', 'email'],
                 'note' => ['required', 'unicode', 'max_words:30'],
                 'phone' => ['required', 'phone'],
@@ -66,18 +66,18 @@ class BuyerController extends Controller
             }
 
             $data = [
-                'amount' => filter_var(trim($_POST['amount']), FILTER_SANITIZE_NUMBER_INT),
-                'buyer' => filter_var(trim($_POST['buyer']), FILTER_SANITIZE_STRING),
-                'receipt_id' => filter_var(trim($_POST['receipt_id']), FILTER_SANITIZE_STRING),
-                'items' => implode(', ', $_POST['items']),
-                'buyer_email' => filter_var(trim($_POST['buyer_email']), FILTER_SANITIZE_EMAIL),
-                'note' => filter_var(trim($_POST['note']), FILTER_SANITIZE_STRING),
-                'phone' => filter_var(trim($_POST['phone']), FILTER_SANITIZE_NUMBER_INT),
-                'city' => filter_var(trim($_POST['city']), FILTER_SANITIZE_STRING),
-                'buyer_ip' => $_SERVER['REMOTE_ADDR'],
-                'hash_key' => hash('sha512', $_POST['receipt_id'] . 'test-salt'),
-                'entry_at' => date('Y-m-d'),
-                'entry_by' => filter_var(trim($_POST['entry_by']), FILTER_SANITIZE_NUMBER_INT),
+                'amount'       => validateInt($_POST['amount']),
+                'buyer'        => sanitizeText($_POST['buyer'] ?? ''),
+                'receipt_id'   => sanitizeText($_POST['receipt_id'] ?? ''),
+                'items'        => implode(', ', array_map('sanitizeText', $_POST['items'])),
+                'buyer_email'  => validateEmail( $_POST['buyer_email']),
+                'note'         => sanitizeText($_POST['note']),
+                'phone'        => validateInt($_POST['phone']),
+                'city'         => sanitizeText($_POST['city']),
+                'buyer_ip'     => $_SERVER['REMOTE_ADDR'] ?? '',
+                'hash_key'     => !empty($post['receipt_id']) ? hash('sha512', $post['receipt_id'] . 'test-salt') : '',
+                'entry_at'     => date('Y-m-d'),
+                'entry_by'     => validateInt($_POST['entry_by'] ?? ''),
             ];
 
             $response['success'] = $this->model->insert($data);

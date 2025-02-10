@@ -29,6 +29,27 @@ function yieldSection($name) {
     return $domSections[$name] ?? '';
 }
 
+
+if (!function_exists('sanitizeText')) {
+    function sanitizeText($input): string
+    {
+        return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('validateInt')) {
+    function validateInt($value): ?int
+    {
+        return filter_var($value, FILTER_VALIDATE_INT) !== false ? (int) $value : null;
+    }
+}
+
+if (!function_exists('validateEmail')) {
+    function validateEmail($value) {
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false ? $value : null;
+    }
+}
+
 if (!function_exists('asset')) {
     function asset($path): string
     {

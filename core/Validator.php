@@ -9,6 +9,7 @@ class Validator
     protected array $errors = [];
     protected array $rules = [
         'required' => 'validateRequired',
+        'array' => 'validateArray',
         'number' => 'validateNumber',
         'max' => 'validateMaxLength',
         'text' => 'validateText',
@@ -52,6 +53,11 @@ class Validator
     protected function validateNumber($value): bool
     {
         return is_numeric($value);
+    }
+
+    protected function validateArray($value): bool
+    {
+        return is_array($value);
     }
 
     protected function validateMaxLength($value, $max): bool
