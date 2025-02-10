@@ -6,8 +6,7 @@ class Router
     public static function route(): void
     {
         require BASE_PATH . '/routes/web.php';
-
-        $requestUri = trim($_SERVER['PATH_INFO']);
+        $requestUri = trim($_SERVER['PATH_INFO'] ?? '/');
         $requestMethod = $_SERVER['REQUEST_METHOD'];
 
         if (isset(ROUTES[$requestUri][$requestMethod])) {

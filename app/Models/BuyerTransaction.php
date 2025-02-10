@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Core\Model;
+use Exception;
 use PDO;
+use PDOException;
 
 class BuyerTransaction extends Model
 {
@@ -79,33 +81,50 @@ class BuyerTransaction extends Model
         return $result ? $result[0] : array();
     }
 
-    public function insert($data = array()): bool
+    public function insert(array $data): bool
     {
         $conn = $this->connectDB();
-        $result = false;
-
-        if ($conn) {
+        try {
+            if (!$conn) {
+                throw new Exception("Database connection failed.");
+            }
+            $conn->beginTransaction();
             $sql = "INSERT INTO {$this->table} (
                 amount, buyer, receipt_id, items, buyer_email, buyer_ip, note, 
                 city, phone, hash_key, entry_at, entry_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ) VALUES (
+                :amount, :buyer, :receipt_id, :items, :buyer_email, :buyer_ip, :note, 
+                :city, :phone, :hash_key, :entry_at, :entry_by
+            )";
 
-            $result = $conn->prepare($sql)->execute([
-                $data['amount'],
-                $data['buyer'],
-                $data['receipt_id'],
-                $data['items'],
-                $data['buyer_email'],
-                $data['buyer_ip'],
-                $data['note'],
-                $data['city'],
-                $data['phone'],
-                $data['hash_key'],
-                $data['entry_at'],
-                $data['entry_by']
-            ]);
+            $stmt = $conn->prepare($sql);
 
+            $stmt->bindParam(':amount', $data['amount'], PDO::PARAM_INT);
+            $stmt->bindParam(':buyer', $data['buyer']);
+            $stmt->bindParam(':receipt_id', $data['receipt_id']);
+            $stmt->bindParam(':items', $data['items']);
+            $stmt->bindParam(':buyer_email', $data['buyer_email']);
+            $stmt->bindParam(':buyer_ip', $data['buyer_ip']);
+            $stmt->bindParam(':note', $data['note']);
+            $stmt->bindParam(':city', $data['city']);
+            $stmt->bindParam(':phone', $data['phone']);
+            $stmt->bindParam(':hash_key', $data['hash_key']);
+            $stmt->bindParam(':entry_at', $data['entry_at']);
+            $stmt->bindParam(':entry_by', $data['entry_by'], PDO::PARAM_INT);
+
+            $stmt->execute();
+            $conn->commit();
+
+            return true;
+        } catch (PDOException $e) {
+            $conn->rollBack();
+            error_log("Insert Error: " . $e->getMessage());
+            return false;
+        } catch (Exception $e) {
+            $conn->rollBack();
+            error_log("General Error: " . $e->getMessage());
+            return false;
         }
-        return $result;
     }
+
 }
