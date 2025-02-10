@@ -65,20 +65,7 @@ class BuyerController extends Controller
                 return;
             }
 
-            $data = [
-                'amount'       => validateInt($_POST['amount']),
-                'buyer'        => sanitizeText($_POST['buyer'] ?? ''),
-                'receipt_id'   => sanitizeText($_POST['receipt_id'] ?? ''),
-                'items'        => implode(', ', array_map('sanitizeText', $_POST['items'])),
-                'buyer_email'  => validateEmail( $_POST['buyer_email']),
-                'note'         => sanitizeText($_POST['note']),
-                'phone'        => validateInt($_POST['phone']),
-                'city'         => sanitizeText($_POST['city']),
-                'buyer_ip'     => $_SERVER['REMOTE_ADDR'] ?? '',
-                'hash_key'     => !empty($post['receipt_id']) ? hash('sha512', $post['receipt_id'] . 'test-salt') : '',
-                'entry_at'     => date('Y-m-d'),
-                'entry_by'     => validateInt($_POST['entry_by'] ?? ''),
-            ];
+            $data = $this->formatFormData();
 
             $response['success'] = $this->model->insert($data);
 
@@ -88,6 +75,24 @@ class BuyerController extends Controller
                 'message' => $exception->getMessage()
             ], HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function formatFormData(): array
+    {
+        return [
+            'amount'       => validateInt($_POST['amount']),
+            'buyer'        => sanitizeText($_POST['buyer'] ?? ''),
+            'receipt_id'   => sanitizeText($_POST['receipt_id'] ?? ''),
+            'items'        => implode(', ', array_map('sanitizeText', $_POST['items'])),
+            'buyer_email'  => validateEmail( $_POST['buyer_email']),
+            'note'         => sanitizeText($_POST['note']),
+            'phone'        => validateInt($_POST['phone']),
+            'city'         => sanitizeText($_POST['city']),
+            'buyer_ip'     => $_SERVER['REMOTE_ADDR'] ?? '',
+            'hash_key'     => !empty($post['receipt_id']) ? hash('sha512', $post['receipt_id'] . 'test-salt') : '',
+            'entry_at'     => date('Y-m-d'),
+            'entry_by'     => validateInt($_POST['entry_by'] ?? ''),
+        ];
     }
 
     private function isSubmittedBefore(): bool
